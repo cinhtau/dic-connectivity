@@ -44,9 +44,6 @@ A backend is a set of servers that receives forwarded requests.
 backend prod_cluster
     balance roundrobin
     mode http
-
-    option httpclose
-
     option httpchk GET / HTTP/1.1\r\nAuthorization:\ Basic\ c3RyZXRjaDpub3RoaW5nX2ludGVyZXN0aW5nX2hlcmUK // <1>
     http-check disable-on-404 // <2>
     http-check expect ! rstatus ^5 // <3>
@@ -69,3 +66,7 @@ backend prod_cluster
 - `fall` = number of consecutive invalid health checks before considering the server as `DOWN`. Default value is `3`
 - `rise` = number of consecutive valid health checks before considering the server as `UP`. Default value is `2`
 <5> `check` = enables health checking
+
+=== HTTP modes in HAProxy
+
+> The https://www.haproxy.com/documentation/aloha/6-5/haproxy/http-modes/[Keep Alive] (KAL) mode is the default mode, when no other options are setup.
