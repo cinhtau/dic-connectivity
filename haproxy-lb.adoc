@@ -1,0 +1,71 @@
+== ACL
+
+> The use of Access Control Lists (ACL) provides a flexible solution to perform content switching and generally to take decisions based on content extracted
+from the request, the response or any environmental status.
+
+.ACL example configuration for Elasticsearch
+[source,config]
+----
+frontend production
+    bind :9200
+    mode http
+    acl is_delete method DELETE // <1>
+    http-request deny if is_delete // <2>
+    default_backend prod_cluster
+----
+<1> if HTTP mode is DELETE
+<2> deny request if condition matches
+
+== Frontend
+
+A frontend defines how requests should be forwarded to backends.
+
+.frontend configuration for Elasticsearch
+[source,config]
+----
+frontend production
+    bind :9200 // <1>
+    mode http // <2>
+    acl is_delete method DELETE
+    http-request deny if is_delete
+    default_backend prod_cluster // <3>
+----
+<1> listen to port `9200`
+<2> level 7 load balancing, pay attention to use HTTPS if it comes to security
+<3> use default backend `prod_cluster`
+
+== Backend
+
+A backend is a set of servers that receives forwarded requests.
+
+.backend configuration for Elasticsearch
+[source,config]
+----
+backend prod_cluster
+    balance roundrobin
+    mode http
+
+    option httpclose
+
+    option httpchk GET / HTTP/1.1\r\nAuthorization:\ Basic\ c3RyZXRjaDpub3RoaW5nX2ludGVyZXN0aW5nX2hlcmUK // <1>
+    http-check disable-on-404 // <2>
+    http-check expect ! rstatus ^5 // <3>
+
+    default-server inter 15s fall 3 rise 2 // <4>
+    server alpha  10.22.62.120:9200 check // <5>
+    server beta   10.22.62.121:9200 check
+    server gamma  10.22.62.122:9200 check
+    server delta  10.22.62.123:9200 check
+----
+<1> Checking a HTTP service:
+- `method` is `GET`
+- `uri` is `/` (base or root path)
+- `version` is `HTTP/1.1`, doesn't allow the default `HTTP/1.0`
+- Basic auth encoded in `base64`, use that only with `HTTPS`
+<2> switches the server to administrative status Maintenance when the server answers the health check with a `404`
+<3> consider all statuses as valid except `5xx`
+<4> default server settings for *response validation*
+- `inter` = parameter sets the interval between two consecutive health checks. If not specified, the default value is `2s`. Set to `15s`, 15 seconds.
+- `fall` = number of consecutive invalid health checks before considering the server as `DOWN`. Default value is `3`
+- `rise` = number of consecutive valid health checks before considering the server as `UP`. Default value is `2`
+<5> `check` = enables health checking

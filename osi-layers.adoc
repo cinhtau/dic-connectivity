@@ -1,0 +1,19 @@
+== Layers
+
+. Physical
+. Data link
+. Network
+. Transport
+. Session
+. Presentation
+. Application
+
+=== Layer 4 Load Balancing
+
+Balance network traffic to multiple servers is to use layer 4 (transport layer) load balancing.
+
+The `PDU` (protocol data unit) is `TCP` or `UDP`.
+
+=== Layer 7 Load Balancing
+
+Using layer 7 allows the load balancer to forward requests to different backend servers based on the content (data) of the user's request.

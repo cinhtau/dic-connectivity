@@ -1,0 +1,3 @@
+== Health Check
+
+Health Checks determine if a backend server is available to process requests. This avoids having to manually remove a server from the backend if it becomes unavailable.

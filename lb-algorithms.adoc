@@ -1,0 +1,12 @@
+== Load Balancing Algorithms
+The load balancing algorithm that is used determines which server, in a backend, will be selected when load balancing.
+
+=== roundrobin
+Round Robin selects servers in turns. This is the default algorithm.
+
+=== leastconn
+Selects the server with the least number of connections--it is recommended for longer sessions. Servers in the same backend are also rotated in a round-robin fashion.
+
+=== source
+This selects which server to use based on a hash of the source IP i.e. your user's IP address. This is one method to ensure that a user will connect to the same server.
+
